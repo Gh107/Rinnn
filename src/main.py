@@ -30,21 +30,36 @@ config = {"configurable": {"thread_id": "1"}}
 
 
 def main():
-    print("Rin is waiting for you.")
+    print("Welcome to the AI Assistant! Use voice or type 'exit' to quit.")
     while True:
-        print("Listening...")
-        for input_text in listen_and_transcribe():
-            print("You said:", input_text)
+        if mic_available:
+            # Use voice input
+            for input_text in listen_and_transcribe():
+                print("You said:", input_text)
+                if input_text.lower() == "exit":
+                    return
+                response = agent_executor.invoke(
+                    {"messages": [HumanMessage(content=input_text)]},
+                    config
+                )
+                print("Mood:", response["structured_response"].get("mood"))
+                print("Action:", response["structured_response"].get("action"))
+                print("Dialogue:",
+                      response["structured_response"].get("dialogue"))
+                break
+        else:
+            # Fallback to text input
+            input_text = input("User: ")
             if input_text.lower() == "exit":
-                return
+                break
             response = agent_executor.invoke(
                 {"messages": [HumanMessage(content=input_text)]},
                 config
             )
             print("Mood:", response["structured_response"].get("mood"))
             print("Action:", response["structured_response"].get("action"))
-            print("Dialogue:", response["structured_response"].get("dialogue"))
-            break  # one utterance per loop
+            print("Dialogue:",
+                  response["structured_response"].get("dialogue"))
 
 
 if __name__ == "__main__":

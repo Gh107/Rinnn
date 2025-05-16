@@ -16,6 +16,14 @@ vad = webrtcvad.Vad(2)  # aggressiveness: 0-3
 asr_model = nemo_asr.models.ASRModel.from_pretrained(
     model_name="nvidia/parakeet-tdt-0.6b-v2"
 )
+# Audio setup with fallback flag
+try:
+    pa = pyaudio.PyAudio()
+    pa.get_default_input_device_info()
+    mic_available = True
+except Exception:
+    print("[Warning] Microphone not available. Falling back to text input.")
+    mic_available = False
 
 
 def listen_and_transcribe(max_silence_ms: int = 1000):
@@ -42,7 +50,7 @@ def listen_and_transcribe(max_silence_ms: int = 1000):
     silent_frames = 0
     max_silent = int(max_silence_ms / FRAME_MS)
 
-    print("VAD initialized.")
+    print("She's listening...")
     result = None
     try:
         while True:
