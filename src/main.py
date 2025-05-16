@@ -30,7 +30,7 @@ config = {"configurable": {"thread_id": "1"}}
 
 
 def main():
-    print("Welcome to the AI Assistant! Use voice or type 'exit' to quit.")
+    print("Rin is waiting for you.")
     while True:
         if mic_available:
             # Use voice input
