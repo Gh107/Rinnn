@@ -21,7 +21,7 @@ Make sure `ffmpeg` is available in your system `PATH`. On Linux:
 sudo apt install ffmpeg
 ```
 
-On Windows, download from the [official site](https://ffmpeg.org/download.html), extract it, and add the `bin` folder to your system's `PATH`.
+On Windows, download from the [official site](https://ffmpeg.org/download.html), extract it to the root of the project.
 
 ---
 
