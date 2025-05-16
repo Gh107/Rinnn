@@ -1,5 +1,6 @@
 from ai_tools import *
 from personality import *
+from audio import *
 
 from dotenv import load_dotenv
 
@@ -27,15 +28,24 @@ agent_executor = create_react_agent(
 
 config = {"configurable": {"thread_id": "1"}}
 
-if __name__ == "__main__":
+
+def main():
+    print("Rin is waiting for you.")
     while True:
-        input_text = input("User: ")
-        if input_text.lower() == "exit":
-            break
-        response = agent_executor.invoke(
-            {"messages": [HumanMessage(content=input_text)]},
-            config
-        )
-        print("Mood:", response["structured_response"].get("mood"))
-        print("Action:", response["structured_response"].get("action"))
-        print("Dialogue:", response["structured_response"].get("dialogue"))
+        print("Listening...")
+        for input_text in listen_and_transcribe():
+            print("You said:", input_text)
+            if input_text.lower() == "exit":
+                return
+            response = agent_executor.invoke(
+                {"messages": [HumanMessage(content=input_text)]},
+                config
+            )
+            print("Mood:", response["structured_response"].get("mood"))
+            print("Action:", response["structured_response"].get("action"))
+            print("Dialogue:", response["structured_response"].get("dialogue"))
+            break  # one utterance per loop
+
+
+if __name__ == "__main__":
+    main()
