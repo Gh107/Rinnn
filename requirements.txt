@@ -1,15 +1,3 @@
-langchain
-langgraph
-langchain-community
-langchain-mcp-adapters
-langchain-openai
-langchain-huggingface
-langchain-chroma
-beautifulsoup4
-webrtcvad
-pyaudio
-soundfile
-huggingface_hub[cli]
 accelerate==0.25.0
 transformers==4.36.2
 tokenizers==0.15.0

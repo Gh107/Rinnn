@@ -27,7 +27,7 @@ On Windows, download from the [official site](https://ffmpeg.org/download.html),
 
 ### 2. Install PyTorch with CUDA Support
 
-Make sure to install the correct version of PyTorch for your CUDA setup (example for CUDA 12.1/12.2):
+Make sure to install the correct version of PyTorch for your CUDA setup (example for CUDA 12.8):
 
 ```bash
 pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu128
@@ -35,27 +35,11 @@ pip install torch torchvision torchaudio --index-url https://download.pytorch.or
 
 ---
 
-### 3. Install NVIDIA NeMo Toolkit
-
-Install the ASR (Automatic Speech Recognition) components of NeMo:
-
-```bash
-pip install -U nemo_toolkit["asr"]
-```
-
----
-
-### 4. Install CUDA Python Bindings
-
-```bash
-pip install -U cuda-python
-```
----
 
 ### 5. Install Remaining Dependencies
 
 ```bash
-pip install -r requirements.txt
+pip install nemo_toolkit["asr"] cuda-python langchain langgraph langchain-community langchain-mcp-adapters langchain-openai langchain-huggingface langchain-chroma beautifulsoup4 webrtcvad pyaudio soundfile huggingface_hub[cli] sounddevice
 ```
 ---
 

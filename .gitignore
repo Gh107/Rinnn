@@ -7,6 +7,10 @@ __pycache__/
 *.so
 *.exe
 /index-tts
+/indextts
+/checkpoints
+*.mp3
+*.wav
 # Distribution / packaging
 .Python
 build/
