@@ -6,6 +6,7 @@ __pycache__/
 # C extensions
 *.so
 *.exe
+/index-tts
 # Distribution / packaging
 .Python
 build/
