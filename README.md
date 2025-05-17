@@ -50,7 +50,6 @@ pip install -U nemo_toolkit["asr"]
 ```bash
 pip install -U cuda-python
 ```
-
 ---
 
 ### 5. Install Remaining Dependencies
@@ -58,9 +57,19 @@ pip install -U cuda-python
 ```bash
 pip install -r requirements.txt
 ```
-
 ---
 
+### 6. Install [Index-TTS](https://github.com/index-tts/index-tts?tab=readme-ov-file)
+
+```bash
+git clone https://github.com/index-tts/index-tts.git
+pip install -r requirements.txt
+huggingface-cli download IndexTeam/IndexTTS-1.5 \
+  config.yaml bigvgan_discriminator.pth bigvgan_generator.pth bpe.model dvae.pth gpt.pth unigram_12000.vocab \
+  --local-dir checkpoints
+```
+
+---
 ## 📂 Project Structure
 
 ```
