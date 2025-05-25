@@ -2,7 +2,6 @@ import sounddevice as sd
 import numpy as np
 import torch
 import nemo.collections.asr as nemo_asr
-import os  # Added for downloading Silero VAD model
 
 # Constants
 RATE = 16000
