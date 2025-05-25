@@ -13,7 +13,7 @@ from langgraph.checkpoint.memory import MemorySaver
 
 load_dotenv()
 memory = MemorySaver()
-'''
+
 tts = IndexTTS(model_dir="checkpoints", cfg_path="checkpoints/config.yaml")
 voice = "vc.wav"
 
@@ -40,7 +40,7 @@ def synthesize_and_play(tts: IndexTTS, voice_prompt: str, text: str):
     # Play via sounddevice
     sd.play(audio, samplerate=sr)
     sd.wait()
-'''
+
 
 llm = init_chat_model("gpt-4o-mini", model_provider="openai")
 
