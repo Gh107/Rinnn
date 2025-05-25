@@ -35,6 +35,7 @@ pip install torch torchvision torchaudio --index-url https://download.pytorch.or
 
 ---
 sudo apt-get install libportaudio2
+pip install deepspeed
 
 ### 5. Install Remaining Dependencies
 

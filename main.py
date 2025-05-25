@@ -79,8 +79,8 @@ def main():
                 print("Action:", response["structured_response"].get("action"))
                 print("Dialogue:",
                       response["structured_response"].get("dialogue"))
-                # synthesize_and_play(
-                #    tts, voice, response["structured_response"].get("dialogue"))
+                synthesize_and_play(
+                    tts, voice, response["structured_response"].get("dialogue"))
                 break
         else:
             # Fallback to text input
