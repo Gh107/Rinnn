@@ -4,9 +4,7 @@ from audio import *
 
 from dotenv import load_dotenv
 from kokoro import KPipeline
-import io
 import sounddevice as sd
-from scipy.io import wavfile
 
 from langchain_core.messages import HumanMessage, SystemMessage
 from langchain.chat_models import init_chat_model
@@ -27,26 +25,15 @@ def synthesize_and_play(text: str):
     Args:
         text: The text to synthesize.
     """
-    # In-memory buffer
-    buf = io.BytesIO()
+    # The pipeline directly returns the audio data as a torch.Tensor
+    for i, (gs, ps, audio_tensor) in enumerate(pipeline(text, voice="af_nicole")):
+        # Ensure the tensor is on CPU
+        audio_tensor = audio_tensor.cpu()
 
-    # Generate WAV into buffer using the pre-initialized pipeline
-    # The 'voice' argument is 'af_nicole' which is a built-in voice for lang_code='a'
-    # The pipeline directly returns the audio data when iterated
-    for i, (gs, ps, audio) in enumerate(pipeline(text, voice="af_nicole")):
-        # Assuming 24000 is the sample rate for kokoro
-        wavfile.write(buf, 24000, audio)
+        # Scale and convert to float32 (sounddevice typically expects float32 or int16)
+        sd.play(audio_tensor, samplerate=24000)
+        sd.wait()
         break  # We only need the first chunk for simple playback if text is short
-
-    buf.seek(0)
-
-    # Read buffer
-    # Use audio_data to avoid conflict with the 'audio' variable in the loop
-    sr, audio_data = wavfile.read(buf)
-
-    # Play via sounddevice
-    sd.play(audio_data, samplerate=sr)
-    sd.wait()
 
 
 llm = init_chat_model("gpt-4o-mini", model_provider="openai")
