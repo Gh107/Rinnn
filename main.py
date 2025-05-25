@@ -3,9 +3,6 @@ from personality import *
 from audio import *
 
 from dotenv import load_dotenv
-import io
-import sounddevice as sd
-from scipy.io import wavfile
 
 from langchain_core.messages import HumanMessage, SystemMessage
 from langchain.chat_models import init_chat_model
