@@ -163,7 +163,7 @@ def listen_and_transcribe(max_silence_ms: int = 1000):
                 # If not speech and buffer is empty, just continue listening silently
 
     except KeyboardInterrupt:
-        print("\nTranscription stopped by user.")
+        exit()
     except Exception as e:
         print(f"An error occurred during listening/transcription: {e}")
     finally:
