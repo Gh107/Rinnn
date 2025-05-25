@@ -4,7 +4,6 @@ from audio import *
 
 from dotenv import load_dotenv
 from kokoro import KPipeline
-import torch
 import io
 import sounddevice as sd
 from scipy.io import wavfile
@@ -21,27 +20,32 @@ memory = MemorySaver()
 pipeline = KPipeline(lang_code="a")
 
 
-def synthesize_and_play(voice_prompt: str, text: str):
+def synthesize_and_play(text: str):
     """
-    Generate speech for `text` using `voice_prompt`, return immediately and play through speakers.
+    Generate speech for `text` using the predefined Kokoro pipeline, return immediately and play through speakers.
 
     Args:
-        tts: Initialized IndexTTS instance.
-        voice_prompt: Path to the cloned voice WAV file.
         text: The text to synthesize.
     """
     # In-memory buffer
     buf = io.BytesIO()
 
-    # Generate WAV into buffer
-    generated = pipeline(text, voice="af_nicole")
+    # Generate WAV into buffer using the pre-initialized pipeline
+    # The 'voice' argument is 'af_nicole' which is a built-in voice for lang_code='a'
+    # The pipeline directly returns the audio data when iterated
+    for i, (gs, ps, audio) in enumerate(pipeline(text, voice="af_nicole")):
+        # Assuming 24000 is the sample rate for kokoro
+        wavfile.write(buf, 24000, audio)
+        break  # We only need the first chunk for simple playback if text is short
+
     buf.seek(0)
 
     # Read buffer
-    sr, audio = wavfile.read(buf)
+    # Use audio_data to avoid conflict with the 'audio' variable in the loop
+    sr, audio_data = wavfile.read(buf)
 
     # Play via sounddevice
-    sd.play(audio, samplerate=sr)
+    sd.play(audio_data, samplerate=sr)
     sd.wait()
 
 
@@ -79,7 +83,7 @@ def main():
                 print("Dialogue:",
                       response["structured_response"].get("dialogue"))
                 synthesize_and_play(
-                    tts, voice, response["structured_response"].get("dialogue"))
+                    response["structured_response"].get("dialogue"))
                 break
         else:
             # Fallback to text input
@@ -94,8 +98,8 @@ def main():
             print("Action:", response["structured_response"].get("action"))
             print("Dialogue:",
                   response["structured_response"].get("dialogue"))
-            # synthesize_and_play(
-            #    tts, voice, response["structured_response"].get("dialogue"))
+            synthesize_and_play(
+                response["structured_response"].get("dialogue"))
 
 
 if __name__ == "__main__":
