@@ -3,7 +3,8 @@ from personality import *
 from audio import *
 
 from dotenv import load_dotenv
-from indextts.infer import IndexTTS
+from kokoro import KPipeline
+import torch
 import io
 import sounddevice as sd
 from scipy.io import wavfile
@@ -17,11 +18,10 @@ from langgraph.checkpoint.memory import MemorySaver
 load_dotenv()
 memory = MemorySaver()
 
-tts = IndexTTS(model_dir="checkpoints", cfg_path="checkpoints/config.yaml")
-voice = "vc.wav"
+pipeline = KPipeline(lang_code="a")
 
 
-def synthesize_and_play(tts: IndexTTS, voice_prompt: str, text: str):
+def synthesize_and_play(voice_prompt: str, text: str):
     """
     Generate speech for `text` using `voice_prompt`, return immediately and play through speakers.
 
@@ -34,7 +34,7 @@ def synthesize_and_play(tts: IndexTTS, voice_prompt: str, text: str):
     buf = io.BytesIO()
 
     # Generate WAV into buffer
-    tts.infer(voice_prompt, text, buf)
+    generated = pipeline(text, voice="af_nicole")
     buf.seek(0)
 
     # Read buffer
