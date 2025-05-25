@@ -135,17 +135,3 @@ def listen_and_transcribe(max_silence_ms: int = 1500, vad_threshold: float = 0.5
         print("Stopping stream...")
         stream.stop()
         stream.close()
-
-# Example usage (uncomment to run)
-# if __name__ == "__main__":
-#     if mic_available:
-#         print("Starting transcription loop. Press Ctrl+C to stop.")
-#         try:
-#             for utterance in listen_and_transcribe():
-#                 print(f"Transcribed: \"{utterance}\"")
-#         except KeyboardInterrupt:
-#             print("Transcription stopped by user.")
-#         except Exception as e:
-#             print(f"An error occurred during transcription: {e}")
-#     else:
-#         print("Microphone not available, cannot run live transcription example.")
