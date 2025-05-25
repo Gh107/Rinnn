@@ -3,6 +3,7 @@ from personality import *
 from audio import *
 
 from dotenv import load_dotenv
+from indextts.infer import IndexTTS
 
 from langchain_core.messages import HumanMessage, SystemMessage
 from langchain.chat_models import init_chat_model
