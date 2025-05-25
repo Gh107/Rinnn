@@ -84,7 +84,7 @@ def listen_and_transcribe(max_silence_ms: int = 1500, vad_threshold: float = 0.5
     # NO vad_state variable needed here, as the model manages its own state
     # vad_state = None # REMOVE THIS LINE
 
-    print("She's listening (using Silero VAD)...")
+    print("She's listening...")
     try:
         while True:
             frame_data, overflow = stream.read(FRAME_SIZE)
