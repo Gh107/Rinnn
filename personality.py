@@ -6,10 +6,6 @@ json_schema = {
     "description": "Respond to the roleplay prompt",
     "type": "object",
     "properties": {
-        "mood": {
-            "type": "string",
-            "description": "Choose exactly one current emotional state from: Joy, Trust/Acceptance, Fear, Surprise, Sadness, Disgust, Anger, Anticipation, Love, Optimism, Disapproval"
-        },
         "action": {
             "type": "string",
             "description": "A brief stage direction or non-verbal action.",
@@ -19,5 +15,5 @@ json_schema = {
             "description": "The waifu's spoken response to the user.",
         },
     },
-    "required": ["mood", "action", "dialogue"],
+    "required": ["action", "dialogue"],
 }

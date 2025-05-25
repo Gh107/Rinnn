@@ -26,7 +26,7 @@ def synthesize_and_play(text: str):
         text: The text to synthesize.
     """
     # The pipeline directly returns the audio data as a torch.Tensor
-    for i, (gs, ps, audio_tensor) in enumerate(pipeline(text, voice="af_nicole")):
+    for _, (_, _, audio_tensor) in enumerate(pipeline(text, voice="af_nicole")):
         # Ensure the tensor is on CPU
         audio_tensor = audio_tensor.cpu()
 
@@ -65,7 +65,6 @@ def main():
                     {"messages": [HumanMessage(content=input_text)]},
                     config
                 )
-                print("Mood:", response["structured_response"].get("mood"))
                 print("Action:", response["structured_response"].get("action"))
                 print("Dialogue:",
                       response["structured_response"].get("dialogue"))
@@ -81,7 +80,6 @@ def main():
                 {"messages": [HumanMessage(content=input_text)]},
                 config
             )
-            print("Mood:", response["structured_response"].get("mood"))
             print("Action:", response["structured_response"].get("action"))
             print("Dialogue:",
                   response["structured_response"].get("dialogue"))

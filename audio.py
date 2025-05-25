@@ -30,7 +30,7 @@ except Exception as e:
     mic_available = False
 
 
-def listen_and_transcribe(max_silence_ms: int = 1000):
+def listen_and_transcribe(max_silence_ms: int = 1500):
     """
     Listen to microphone input using sounddevice, perform VAD to detect speech segments,
     and transcribe each utterance with the ASR model.
