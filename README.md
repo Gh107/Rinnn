@@ -36,61 +36,14 @@ pip install torch torchvision torchaudio --index-url https://download.pytorch.or
 ---
 sudo apt-get install libportaudio2
 ---
-pip install deepspeed
----
 pip install kokoro
 ---
 
 ### 5. Install Remaining Dependencies
 
 ```bash
-pip install nemo_toolkit["asr"] cuda-python langchain langgraph langchain-community langchain-mcp-adapters langchain-openai langchain-huggingface langchain-chroma beautifulsoup4 webrtcvad pyaudio soundfile huggingface_hub[cli] sounddevice
+pip install nemo_toolkit["asr"] cuda-python langchain langgraph langchain-community langchain-openai langchain-huggingface langchain-chroma beautifulsoup4 huggingface_hub[cli] sounddevice silero-vad
 ```
----
-
-### 6. Install [Index-TTS](https://github.com/index-tts/index-tts?tab=readme-ov-file)
-
-```bash
-git clone https://github.com/index-tts/index-tts.git
-pip install -r requirements.txt
-huggingface-cli download IndexTeam/IndexTTS-1.5 \
-  config.yaml bigvgan_discriminator.pth bigvgan_generator.pth bpe.model dvae.pth gpt.pth unigram_12000.vocab \
-  --local-dir checkpoints
-```
-
----
-## 📂 Project Structure
-
-```
-rinnn/
-├── src/
-├── models/
-├── data/
-├── outputs/
-├── requirements.txt
-└── README.md
-```
-
----
-
-## 🧠 Powered By
-
-- [PyTorch](https://pytorch.org/)
-- [NVIDIA NeMo](https://github.com/NVIDIA/NeMo)
-- [FFmpeg](https://ffmpeg.org/)
-
----
-
-## 🛠️ Troubleshooting
-
-- Ensure your CUDA drivers are installed and match the version of PyTorch.
-- Test CUDA availability with:
-
-```python
-import torch
-print(torch.cuda.is_available())
-```
-
 ---
 
 ## 📄 License

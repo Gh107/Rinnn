@@ -6,14 +6,15 @@ from dotenv import load_dotenv
 from kokoro import KPipeline
 import sounddevice as sd
 
-from langchain_core.messages import HumanMessage, SystemMessage
+from langchain_core.prompts import ChatPromptTemplate
 from langchain.chat_models import init_chat_model
-from langgraph.prebuilt import create_react_agent
-from langgraph.checkpoint.memory import MemorySaver
+from langgraph.store.memory import InMemoryStore
+from langchain_core.output_parsers import PydanticOutputParser
+from pydantic import BaseModel, Field
 
 
 load_dotenv()
-memory = MemorySaver()
+memory = InMemoryStore()
 
 pipeline = KPipeline(lang_code="a")
 
@@ -36,55 +37,46 @@ def synthesize_and_play(text: str):
         break  # We only need the first chunk for simple playback if text is short
 
 
-llm = init_chat_model("gpt-4o-mini", model_provider="openai")
+class Response(BaseModel):
+    "Response to the roleplay prompt"
+    action: str = "A brief stage direction or non-verbal action."
+    dialogue: str = "The waifu's spoken response to the user."
 
-system_prompt = SystemMessage(
-    content=personality)
 
-agent_executor = create_react_agent(
-    llm,
-    tools,
-    prompt=system_prompt,
-    response_format=json_schema,
-    checkpointer=memory
+parser = PydanticOutputParser(pydantic_object=Response)
+llm = init_chat_model("gpt-4.1-nano", model_provider="openai")
+
+prompt = ChatPromptTemplate.from_messages(
+    [
+        (
+            "system",
+            "{personality}",
+        ),
+        ("human", "{query}"),
+    ]
 )
 
+llm_with_tools = llm.bind_tools(tools)
+chain = prompt | llm_with_tools
 config = {"configurable": {"thread_id": "1"}}
 
 
 def main():
     print("Rin is waiting for you.")
     while True:
-        if mic_available:
-            # Use voice input
-            for input_text in listen_and_transcribe():
-                print("You said:", input_text)
-                if input_text.lower() == "exit":
-                    return
-                response = agent_executor.invoke(
-                    {"messages": [HumanMessage(content=input_text)]},
-                    config
-                )
-                print("Action:", response["structured_response"].get("action"))
-                print("Dialogue:",
-                      response["structured_response"].get("dialogue"))
-                synthesize_and_play(
-                    response["structured_response"].get("dialogue"))
-                break
-        else:
-            # Fallback to text input
-            input_text = input("User: ")
+        # Use voice input
+        for input_text in listen_and_transcribe():
+            print("You said:", input_text)
             if input_text.lower() == "exit":
-                break
-            response = agent_executor.invoke(
-                {"messages": [HumanMessage(content=input_text)]},
+                return
+            response = chain.invoke(
+                {"query": input_text, "personality": personality},
                 config
             )
-            print("Action:", response["structured_response"].get("action"))
-            print("Dialogue:",
-                  response["structured_response"].get("dialogue"))
-            synthesize_and_play(
-                response["structured_response"].get("dialogue"))
+            response_content = str(response.content)
+            print(response_content)
+            synthesize_and_play(response_content)
+            break
 
 
 if __name__ == "__main__":
