@@ -3,7 +3,7 @@ from personality import *
 from audio import *
 
 from dotenv import load_dotenv
-from kokoro import KPipeline
+from chatterbox.tts import ChatterboxTTS
 import sounddevice as sd
 
 from langchain_core.prompts import ChatPromptTemplate
@@ -15,26 +15,48 @@ from pydantic import BaseModel, Field
 
 load_dotenv()
 memory = InMemoryStore()
+AUDIO_PROMPT_PATH = "vc.mp3"
 
-pipeline = KPipeline(lang_code="a")
+model = ChatterboxTTS.from_pretrained(device="cuda")
 
 
-def synthesize_and_play(text: str):
+def generate(model, text, audio_prompt_path, exaggeration, temperature, cfgw):
     """
-    Generate speech for `text` using the predefined Kokoro pipeline, return immediately and play through speakers.
-
-    Args:
-        text: The text to synthesize.
+    Generates audio from text using the ChatterboxTTS model, plays it,
+    and returns the sample rate and waveform.
     """
-    # The pipeline directly returns the audio data as a torch.Tensor
-    for _, (_, _, audio_tensor) in enumerate(pipeline(text, voice="af_nicole")):
-        # Ensure the tensor is on CPU
-        audio_tensor = audio_tensor.cpu()
+    # Generate audio waveform as a PyTorch tensor
+    # This tensor might be on the GPU if 'model' was loaded to CUDA
+    wav_tensor = model.generate(
+        text,
+        audio_prompt_path=audio_prompt_path,
+        exaggeration=exaggeration,
+        temperature=temperature,
+        cfg_weight=cfgw,
+    )
 
-        # Scale and convert to float32 (sounddevice typically expects float32 or int16)
-        sd.play(audio_tensor, samplerate=24000)
-        sd.wait()
-        break  # We only need the first chunk for simple playback if text is short
+    # Get the sample rate from the model
+    sample_rate = model.sr
+
+    # Prepare the waveform for sounddevice:
+    # 1. Remove batch dimension (ChatterboxTTS output is typically [1, N_samples]).
+    # 2. Move tensor to CPU (if it was on CUDA, as 'sounddevice' needs CPU data).
+    # 3. Convert to a NumPy array.
+    numpy_wav = wav_tensor.squeeze(0).cpu().numpy()
+
+    # Play the audio using sounddevice
+    # sounddevice expects data in a format like float32 in the range [-1.0, 1.0],
+    # which ChatterboxTTS typically provides.
+    print(f"Playing audio at {sample_rate} Hz...")
+    sd.play(numpy_wav, samplerate=sample_rate)
+
+    # Wait for the playback to complete before proceeding
+    sd.wait()
+    print("Playback finished.")
+
+    # As in the original function's intent, return the sample rate and the NumPy waveform.
+    # This allows the caller to potentially save the file or perform other operations if needed.
+    return (sample_rate, numpy_wav)
 
 
 class Response(BaseModel):
@@ -64,18 +86,40 @@ config = {"configurable": {"thread_id": "1"}}
 def main():
     print("Rin is waiting for you.")
     while True:
-        # Use voice input
-        for input_text in listen_and_transcribe():
+        for input_text in listen_and_transcribe():  # Assuming listen_and_transcribe is defined
             print("You said:", input_text)
             if input_text.lower() == "exit":
+                print("Exiting...")
                 return
+
             response = chain.invoke(
+                # Ensure 'personality' is defined
                 {"query": input_text, "personality": personality},
                 config
             )
             response_content = str(response.content)
-            print(response_content)
-            synthesize_and_play(response_content)
+            # Changed from print(response_content) for clarity
+            print("Rin says:", response_content)
+
+            # Define parameters for TTS generation
+            # You can adjust these values as needed
+            exaggeration_factor = 1.0  # Default: 1.0
+            temperature_value = 0.7    # Default: 0.7
+            # Default: 3.0 (sometimes referred to as guidance)
+            cfg_weight_value = 3.0
+
+            # Call the corrected generate function to synthesize and play audio
+            generate(
+                model,
+                response_content,
+                AUDIO_PROMPT_PATH,
+                exaggeration_factor,
+                temperature_value,
+                cfg_weight_value
+            )
+            # The 'break' was in your original loop; keeping it if it's intentional
+            # This break will cause the 'listen_and_transcribe' loop to exit after one iteration
+            # and the outer 'while True' loop to restart, waiting for new input.
             break
 
 

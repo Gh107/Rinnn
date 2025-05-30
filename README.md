@@ -42,7 +42,7 @@ pip install kokoro
 ### 5. Install Remaining Dependencies
 
 ```bash
-pip install nemo_toolkit["asr"] cuda-python langchain langgraph langchain-community langchain-openai langchain-huggingface langchain-chroma beautifulsoup4 huggingface_hub[cli] sounddevice silero-vad
+pip install nemo_toolkit["asr"] cuda-python langchain langgraph langchain-community langchain-openai langchain-huggingface langchain-chroma beautifulsoup4 huggingface_hub[cli] sounddevice silero-vad chatterbox-tts
 ```
 ---
 
