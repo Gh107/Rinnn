@@ -5,6 +5,7 @@ from audio import *
 from dotenv import load_dotenv
 from chatterbox.tts import ChatterboxTTS
 import sounddevice as sd
+from timeit import default_timer as timer
 
 from langchain_core.prompts import ChatPromptTemplate
 from langchain.chat_models import init_chat_model
@@ -42,8 +43,10 @@ def generate(model, text, audio_prompt_path, exaggeration, temperature, cfgw):
     # 1. Remove batch dimension (ChatterboxTTS output is typically [1, N_samples]).
     # 2. Move tensor to CPU (if it was on CUDA, as 'sounddevice' needs CPU data).
     # 3. Convert to a NumPy array.
-    numpy_wav = wav_tensor.squeeze(0).cpu().numpy()
+    return wav_tensor.squeeze(0).cpu().numpy()
 
+
+def play_audio(numpy_wav, sample_rate):
     # Play the audio using sounddevice
     # sounddevice expects data in a format like float32 in the range [-1.0, 1.0],
     # which ChatterboxTTS typically provides.
@@ -86,12 +89,10 @@ config = {"configurable": {"thread_id": "1"}}
 def main():
     print("Rin is waiting for you.")
     while True:
+        bench1 = timer()
         for input_text in listen_and_transcribe():  # Assuming listen_and_transcribe is defined
             print("You said:", input_text)
-            if input_text.lower() == "exit":
-                print("Exiting...")
-                return
-
+            bench2 = timer()
             response = chain.invoke(
                 # Ensure 'personality' is defined
                 {"query": input_text, "personality": personality},
@@ -100,6 +101,7 @@ def main():
             response_content = str(response.content)
             # Changed from print(response_content) for clarity
             print("Rin says:", response_content)
+            bench3 = timer()
 
             # Define parameters for TTS generation
             # You can adjust these values as needed
@@ -109,7 +111,7 @@ def main():
             cfg_weight_value = 3.0
 
             # Call the corrected generate function to synthesize and play audio
-            generate(
+            wav_data = generate(
                 model,
                 response_content,
                 AUDIO_PROMPT_PATH,
@@ -117,9 +119,13 @@ def main():
                 temperature_value,
                 cfg_weight_value
             )
+            bench4 = timer()
+            _, _ = play_audio(wav_data, model.sr)
             # The 'break' was in your original loop; keeping it if it's intentional
             # This break will cause the 'listen_and_transcribe' loop to exit after one iteration
             # and the outer 'while True' loop to restart, waiting for new input.
+            print(
+                f"Benchmarks: Input: {bench2 - bench1:.2f}s, Response: {bench3 - bench2:.2f}s, TTS: {bench4 - bench3:.2f}s")
             break
 
 
