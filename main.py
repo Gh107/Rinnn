@@ -36,9 +36,6 @@ def generate(model, text, audio_prompt_path, exaggeration, temperature, cfgw):
         cfg_weight=cfgw,
     )
 
-    # Get the sample rate from the model
-    sample_rate = model.sr
-
     # Prepare the waveform for sounddevice:
     # 1. Remove batch dimension (ChatterboxTTS output is typically [1, N_samples]).
     # 2. Move tensor to CPU (if it was on CUDA, as 'sounddevice' needs CPU data).
@@ -69,7 +66,7 @@ class Response(BaseModel):
 
 
 parser = PydanticOutputParser(pydantic_object=Response)
-llm = init_chat_model("gpt-4.1-nano", model_provider="openai")
+llm = init_chat_model("claude-3-5-haiku-20241022", model_provider="anthropic")
 
 prompt = ChatPromptTemplate.from_messages(
     [
